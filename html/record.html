@@ -1,0 +1,47 @@
+
+
+<button ng-click="previousRecord()">Previous Record</button>
+<button ng-click="nextRecord()">Next Record</button>
+<button ng-click="showResults()">Back to Results</button>
+<button ng-click="newSearch()">New Search</button>
+
+<!--  This is a recursive template to show a record -->
+
+<script id="subRecord.html" type="text/ng-template">
+<table class="uifRecord">
+
+	<tr ng-if="!(getType(data) == 'Object')"  ><td> {{data}}</td></tr>
+    <tr ng-if="getType(data) == 'Object'" ng-repeat="(key,value) in data ">
+		<!--Only Objects have Keys-->
+        <td ng-if="getType(data) == 'Object'" class="uifRecordFieldname" >  {{key}}</td>
+        <td  class="uifRecordValue">
+            <div ng-if="getType(value) === 'String'">
+                {{value}}
+			</div>
+            <div ng-if="getType(value) === 'Number'">
+                {{value}}
+            </div>
+ 			<div ng-if="getType(value) === 'Object'">
+                <ng-include src="'subRecord.html'"
+                                onload="data = value" />
+            </div>
+            <div ng-if="getType(value) === 'Array'">
+                <table>
+					
+                    <tr ng-repeat="subobject in value">
+                        <td><ng-include
+                                src="'subRecord.html'"
+                                onload="data = subobject" /></td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>
+</script>
+
+<div>
+<!-- This little hack to force a reparse -->
+<ng-include  ng-repeat="v in mongoDB.lastUpdate" src="'subRecord.html'" onload="data = mongoDB.currentRecordJSON" ></ng-include>
+</div>
+

@@ -1,0 +1,19 @@
+<button ng-disabled="mongoDB.currentRecordNo < mongoDB.pageSize" ng-click="previousPage()">Previous Page</button>
+<button ng-disabled="mongoDB.currentRecordNo + mongoDB.pageSize >= mongoDB.totalRecs" ng-click="nextPage()">Next Page</button>
+<button ng-click="newSearch()">New Search</button>
+
+
+<div ng-if="mongoDB.totalRecs == 0">
+Nothing Found matching that search.
+</div>
+
+<table ng-if="mongoDB.totalRecs > 0">
+    <tr>
+    <th ng-repeat="(key,value) in mongoDB.resultSet[0]">{{key}}</th>
+    </tr>
+    <tr ng-click="selectRecord($index + mongoDB.resultStart)" ng-repeat='result in mongoDB.getCurrentResultsPage()'>
+        <td ng-repeat="(key,value) in result">{{value}}</td>
+    </tr>
+</table>
+
+

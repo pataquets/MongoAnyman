@@ -1,0 +1,56 @@
+<!doctype html>
+<html ng-app>
+<head>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+<script>
+    function ScratchCtrl($scope) {
+        $scope.numbers = [ 2, 3, 4, 7, 9 ];
+        $scope.isEven = function(x) {
+
+            if (x % 2 == 0)
+                return true;
+            return false;
+        }
+    }
+</script>
+</head>
+
+<body>
+    <div ng-controller="ScratchCtrl">
+        <table>
+            <tr ng-repeat="number in numbers">
+                <td>Number: {{number}}</td>
+                <td><div ng-if="isEven(number)">is Even</div></td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
+
+
+
+
+<table>
+    <tr ng-repeat="(key,value) in currentRecord">
+        <td>{{key}}</td>
+        <td>
+            <div ng-if="getType(value) === 'String'">
+                [LIT]<input ng-model="currentRecord[key]"></input>
+            </div>
+            <div ng-if="getType(value) === 'Array'">
+                <Table>
+                    <tr ng-repeat="subobject in value">
+                        <td> GOT: {{subobject}}</td>
+                        <td><ng-include
+                                src="'subRecord.html'"
+                                onload="data = subobject" /></td>
+                    </tr>
+                </Table>
+
+            </div>
+        </td>
+
+
+    </tr>
+</table>
