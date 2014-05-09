@@ -1,13 +1,14 @@
-<button ng-disabled="mongoDB.currentRecordNo < mongoDB.pageSize" ng-click="previousPage()">Previous Page</button>
-<button ng-disabled="mongoDB.currentRecordNo + mongoDB.pageSize >= mongoDB.totalRecs" ng-click="nextPage()">Next Page</button>
-<button ng-click="newSearch()">New Search</button>
-
+<div class="buttonBar">
+<button  class="controlButton" ng-disabled="mongoDB.currentRecordNo < mongoDB.pageSize" ng-click="previousPage()">Previous Page</button>
+<button  class="controlButton" ng-disabled="mongoDB.currentRecordNo + mongoDB.pageSize >= mongoDB.totalRecs" ng-click="nextPage()">Next Page</button>
+<button  class="controlButton" ng-click="newSearch()">New Search</button>
+</div>
 
 <div ng-if="mongoDB.totalRecs == 0">
 Nothing Found matching that search.
 </div>
 
-<table ng-if="mongoDB.totalRecs > 0">
+<table class ="resultTable" ng-if="mongoDB.totalRecs > 0">
     <tr>
     <th ng-repeat="(key,value) in mongoDB.resultSet[0]">{{key}}</th>
     </tr>
@@ -15,5 +16,6 @@ Nothing Found matching that search.
         <td ng-repeat="(key,value) in result">{{value}}</td>
     </tr>
 </table>
+
 
 

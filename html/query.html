@@ -1,3 +1,24 @@
-Search For: <input ng-model="mongoDB.currentQuery">
- <button ng-click="doNewSearch()" > Search </button>
- 
+
+<div id="availableSearchContainer">
+   <ul id="availableSearchesList">
+        <li 
+            ng-repeat='search in mongoDB.searchList'>
+            <a ng-click="mongoDB.queryID = $index" href="#">{{search.description}}</a>
+        </li>
+</ul>
+</div>
+
+<div class="searchForm" id="searchFieldsContainer">
+
+            <span ng-repeat='field in mongoDB.searchList[mongoDB.queryID].args'>
+            <label>{{field}}:</label>
+            <input ng-model="terms[field]"><br>
+            </span>
+
+
+<div class="buttonBar">
+    <button class="controlButton" ng-click="doNewSearch()">
+        Search</button>
+</div>
+
+</div>

@@ -2,7 +2,7 @@ import MySQLdb.cursors
 import pymongo
 
 def get_subrec( table, fromcol, fromval):
-    subreccursor = db.cursor()
+   
     subreccursor.execute("select * from " + table + " where " + fromcol + " = %s",(fromval,))
     return subreccursor.fetchall();
     
@@ -20,12 +20,20 @@ personcursor = db.cursor()
 personcursor.execute("set names utf8") #MongoDB uses UTF-8 so lets get that back from MySQL
 
 personcursor.execute("select * from  " + toptable)
-
+subreccursor = db.cursor()
+ 
 connection.imdb.people.drop();
+count =0
+recs = []
 
 for row in personcursor.fetchall():
     actorid = row.pop("actorid");
-    row["_id"] = actorid;
+    row["_id"] = { "tp": "pers", "id": actorid };
     row["aka"] = get_subrec("akanames","name",row["name"])
-    connection.imdb.people.insert(row)
-    
+    recs.append(row)
+    if count % 1000 == 0:
+        print count
+        connection.imdb.data.insert(recs)
+        recs = []
+        
+    count = count + 1

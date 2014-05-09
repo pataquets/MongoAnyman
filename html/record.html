@@ -1,19 +1,19 @@
 
-
-<button ng-click="previousRecord()">Previous Record</button>
-<button ng-click="nextRecord()">Next Record</button>
-<button ng-click="showResults()">Back to Results</button>
-<button ng-click="newSearch()">New Search</button>
+<div class="buttonBar">
+<button class="controlButton"  ng-disabled="mongoDB.currentRecordNo==0" ng-click="previousRecord()">Previous Record</button>
+<button  class="controlButton" ng-disabled="mongoDB.currentRecordNo+1==mongoDB.totalRecs"  ng-click="nextRecord()">Next Record</button>
+<button class="controlButton" ng-click="showResults()">Back to Results</button>
+<button class="controlButton"  ng-click="newSearch()">New Search</button>
+</div>
 
 <!--  This is a recursive template to show a record -->
 
 <script id="subRecord.html" type="text/ng-template">
-<table class="uifRecord">
-
-	<tr ng-if="!(getType(data) == 'Object')"  ><td> {{data}}</td></tr>
+<table class="mongoRecord">
+	<tr ng-if="!(getType(data) == 'Object')"  ><td   class="uifRecordValue"> {{data}}</td></tr>
     <tr ng-if="getType(data) == 'Object'" ng-repeat="(key,value) in data ">
 		<!--Only Objects have Keys-->
-        <td ng-if="getType(data) == 'Object'" class="uifRecordFieldname" >  {{key}}</td>
+        <td ng-if="getType(data) == 'Object'" class="uifRecordFieldname" >  {{key}}:</td>
         <td  class="uifRecordValue">
             <div ng-if="getType(value) === 'String'">
                 {{value}}
@@ -26,7 +26,7 @@
                                 onload="data = value" />
             </div>
             <div ng-if="getType(value) === 'Array'">
-                <table>
+                <table class="mongoArrayRecord">
 					
                     <tr ng-repeat="subobject in value">
                         <td><ng-include
@@ -40,7 +40,7 @@
 </table>
 </script>
 
-<div>
+<div class="recordTop">
 <!-- This little hack to force a reparse -->
 <ng-include  ng-repeat="v in mongoDB.lastUpdate" src="'subRecord.html'" onload="data = mongoDB.currentRecordJSON" ></ng-include>
 </div>

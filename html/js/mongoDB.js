@@ -3,23 +3,30 @@
 "use strict";
 
 aMongoIntel.service('mongoDB', function($http, $timeout,$location, $rootScope) {
-    var me = this; // Let's us get easy access inside async callbacks
+    var me = this; // Let's us get easy access inside async callbacks where this has changed
     this.pageSize = 10;
     this.currentQuery = 'test';
     this.lastUpdate = [ 1 ]; // Hack to get Angular to re render some things
     this.currentRecordNo = 0;
-    this.currentRecordJSON = {}
+    this.currentRecordJSON = {};
     this.totalRecs = 999999; // We don't know initially
     this.resultSet = []
     this.resultPage = []; // This is cached to avoid Angular issues
     this.resultStart = -1; // Info on what's cached
-
+    this.searchList = [];
+    this.queryID = 0;
     
+    //Fetch our list of searches from the server
+    $http.get('/searches').success(
+            function(data) { me.searchList = data.searches 
+            console.log(data)
+            })
+                
     // Reset everything and do a new search - for now we will
     // have a single search in play at one
     // Time - no history of searches.
 
-    this.doNewSearch = function() {
+    this.doNewSearch = function( terms) {
         me.lastUpdate = [ 1 ]; // Hack to get Angular to re render some things
         me.currentRecordNo = 0;
         me.currentRecordJSON = {}
@@ -27,6 +34,8 @@ aMongoIntel.service('mongoDB', function($http, $timeout,$location, $rootScope) {
         me.resultSet = []
         me.resultPage = []; // This is cached to avoid Angular issues
         me.resultStart = -1; // Info on what's cached
+        me.queryTerms = terms;
+        // Also work out what we are meant to be doing
         
     }
 
@@ -45,8 +54,13 @@ aMongoIntel.service('mongoDB', function($http, $timeout,$location, $rootScope) {
         }
 
         // Do we have the info for the cache? - if not we should fetch it
+        
         if (start >= me.resultSet.length) {
-            $http.get('/results/' + this.currentQuery + "/" + start).success(
+            $http({url : '/results',
+                method: "GET",
+                params: { queryID: me.searchList[me.queryID].name , start: start,
+                    page: me.pageSize, terms: me.queryTerms }                
+            }).success(
                     function(data) {
                         if (data.length == 0 && start == 0) {
                             me.totalRecs = 0;
@@ -126,12 +140,17 @@ aMongoIntel.service('mongoDB', function($http, $timeout,$location, $rootScope) {
     this.fetchRecord = function(recno) {
         
         me.currentRecordNo = recno
-    
         var id = me.resultSet[recno]['_id'];
-        $http.get('/movies/' + id).success(function(data) {
+        //TODO add exception handler here
+        
+        $http({url : '/records',
+            method: "GET",
+            params: { queryID: me.searchList[me.queryID].name , recordID:id }                
+        }).success(function(data) {
             angular.copy(data, me.currentRecordJSON)
 
             me.lastUpdate = [ 2 ]; // Angular update hack
         })
     }
+    
 })
