@@ -1,0 +1,26 @@
+table.resultTable{
+    width:80%;
+    text-align:left;
+    margin: 0 auto;
+    color:#000;
+    border-radius: 5px;
+    border: 2px solid ;
+    border-colour: transparent;
+}
+
+
+.resultTable td{
+padding: 12px 10px 12px 20px;
+background-color:#DED;
+top-margin: 5px;
+border-radius: 5px;
+   
+}
+
+.resultTable th{
+top-margin: 5px;
+padding: 12px 10px 12px 20px;
+background-color:#CDC;
+border-radius: 5px;
+}
+

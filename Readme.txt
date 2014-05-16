@@ -1,12 +1,88 @@
+Getting Started
+----------------
+
+Run intel.py (python intel.py)
+Point browser at localhost:8080
+
+You need to define at least one search
+A search is defined as a mongoDB document in demos.searches
+
+
+{ _id: Unique Name
+  description: How it's shown to the user
+  query: JSON QUERY
+  collection:
+  database: 
+  summary: JSON PROJECTION
+}
+  JSON QUERY is a String containing the JSON, not a JSON Object for a search, you can use placeholders as @Fieldname in the query
+  which will be shown as the fields to search. All strings must be quoted.
+  
+  JSON PROJECTION is s String containing the JSON for a MongoDB 'project'
+  
+For Example 
+use demos
+
+db.searches.insert({
+ _id: 'MoviesFTS',
+ description: 'Full Movie Text Search',
+ collection: 'data',
+ database: 'imdb',
+ summary: '{"title":1}',
+ query: '{ "$text": { "$search": "@Query" },"_id":{"$regex":"^m"}}',
+ links: [ {from: "actorno", tosearch: "ActorByID"} ],
+ visible: true
+ })
+ 
+  db.searches.insert({
+	"_id" : "MovieByID",
+	"description" : "Fetch Movie By ID",
+	"collection" : "data",
+	"database" : "imdb",
+	"summary" : "{\"title\":1}",
+	"query" : "{ \"_id\":\"@movieno\" }",
+	 links: [ {from: "actorno", tosearch: "ActorByID"} ],
+	 visible: false
+})
+
+ 
+ db.searches.insert({
+ _id: 'ActorByID',
+ description: 'Fetch Actor By ID',
+ collection: 'data',
+ database: 'imdb',
+ summary: '{"name":1}',
+ query: '{ "_id":"@actorno"}',
+  links: [ {from: "movieno", tosearch: "MovieByID"} ],
+  visible: false
+ })
+ 
+ 
+ 
+ db.searches.insert({
+ _id: 'ActorsFTS',
+ description: 'Actors Text Search',
+ collection: 'data',
+ database: 'imdb',
+ summary: '{"name":1}',
+ query: '{ "$text": { "$search": "@Query" },"_id":{"$regex":"^a"}}',
+ links: [ {from: "movieno", tosearch: "MovieByID"} ],
+  visible: true
+ })
+ 
 Backlog, in order
 ---------
 
-Search template
+Search template[Done]
 *Bug - empty template fields [FIXED]
 regex support[DONE]
-next/previous greying on record
-Take stock and tighten up
-Stylesheet
+next/previous greying on record[Done]
+
+
+Stylesheet [Done]
+
+Change to be RESTful - remove server state!
+
 Create a demo
 [Version 1 DEMO]
 

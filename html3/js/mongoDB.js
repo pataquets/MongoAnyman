@@ -20,7 +20,10 @@ aMongoIntel.service('mongoDB', function($http, $timeout,$location, $rootScope) {
     $http.get('/searches').success(
             function(data) { 
             me.searchList = data.searches 
-            console.log(data)
+            var keys = Object.keys(me.searchList);
+            console.log(keys)
+            me.queryID = keys[0]
+            console.log(me.queryID)
             })
                 
     // Reset everything and do a new search - for now we will

@@ -3,22 +3,28 @@
    <ul id="availableSearchesList">
         <li 
             ng-repeat='search in mongoDB.searchList'>
-            <a ng-if="search.visible" ng-click="mongoDB.queryID = $index" href="#">{{search.description}}</a>
+            <a ng-if="search.visible == true" ng-click="searchClick(search.name)" href="#">{{search.description}}</a>
         </li>
 </ul>
+
 </div>
+
+
+
 
 <div class="searchForm" id="searchFieldsContainer">
 
-            <span ng-repeat='field in mongoDB.searchList[mongoDB.queryID].args'>
+            <span ng-repeat='field in mongoDB.searchList[queryID].args'>
             <label>{{field}}:</label>
             <input ng-model="terms[field]"><br>
             </span>
 
 
+
 <div class="buttonBar">
     <button class="controlButton" ng-click="doNewSearch()">
         Search</button>
+        {{model.search}}
 </div>
 
 </div>

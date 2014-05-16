@@ -11,7 +11,7 @@ from pprint import  pprint
 #Basic HTML serving functions
 connection_string = "mongodb://localhost:27017"
 connection = pymongo.MongoClient(connection_string)
-database = connection.demos
+config_database = connection['demos']
 global_searches = {}
 
 from time import mktime
@@ -39,11 +39,12 @@ def run_query_send_results():
     termdict = json.loads(terms)
     summary = global_searches[queryID]['summary']
     mycollection = global_searches[queryID]['collection']
+    mydb = global_searches[queryID]['database']
     mysearch = json.loads(global_searches[queryID]['query'])
     queryobject = build_query(mysearch,termdict)
     pprint(queryobject)
     mysummary = json.loads(summary)
-    rval = database[mycollection].find(queryobject,mysummary).skip(int(start)).limit(int(pagesize))
+    rval = connection[mydb][mycollection].find(queryobject,mysummary).skip(int(start)).limit(int(pagesize))
     return json.dumps(list(rval),cls=DateTimeEncoder)
 
 
@@ -55,11 +56,14 @@ def build_query(query,params):
             #An object with $regex is a regular expression
             #TODO optional args
             value = build_query(query[key],params);
+            
             if key == "$regex":
                 try:
                     mongo_re=re.compile(value);
+                    print "REGEX"
                     return mongo_re
                 except:
+                    print "BAD REGEX " + str(value)
                     return ""; #User passing in a regex may be incorrect
             else:
                 rval[key] = value
@@ -76,6 +80,8 @@ def build_query(query,params):
                     except:
                         rval = ""
                     return rval
+                else:
+                    return query
     else:
         return query
                     
@@ -97,19 +103,26 @@ def parse_out_placeholders(d,obj):
 @route('/searches')
 def get_searches():
     global global_searches
-    searches = database.searches.find()
+    searches = config_database.searches.find()
     #Don't want to send the actual query details to the client - it's a secret
     rsearches = [];
     for search in searches:
-        global_searches[search['_id']] = search #Global hash
+        
         s = {}
         s['name'] = search['_id'];
         s['description'] = search['description'];
+        s['visible'] = search['visible'];
         placeholders = {}
         parse_out_placeholders(placeholders,json.loads(search['query']))
         s['args'] = list(placeholders.keys())
+        #Links optional
+        try:    
+            s['links'] = search['links']
+        except:
+            pass
+        global_searches[search['_id']] = search #Global hash
         rsearches.append(s)
-        
+              
     pprint(global_searches)    
     return {'searches':rsearches}
 
@@ -127,19 +140,20 @@ def get_record():
     recordID = params['recordID']
     
     mycollection = global_searches[queryID]['collection']
+    database = global_searches[queryID]['database']
     print "Record _id = " + recordID + "in" + mycollection;
     recordID = safecast_integer(recordID)
     
-    movie = database[mycollection].find_one({"_id": recordID});
+    movie = connection[database][mycollection].find_one({"_id": recordID});
     pprint(movie)
     return json.dumps(movie,cls=DateTimeEncoder)
 
 @route('/app/js/<filename:path>')
-def send_static(filename):
+def send_js(filename):
     return static_file(filename, root='./html/js')
 
 @route('/app/<filename:path>')
-def send_static(filename):
+def send_app(filename):
     return static_file(filename, root='./html')
 
 @route('/static/<filename:path>')

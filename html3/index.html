@@ -1,0 +1,23 @@
+<!doctype html >
+<html ng-app="MongoIntel">
+  <head>
+  <meta charset="UTF-8">
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-resource.min.js"></script>
+        <script src='/app/js/routes.js'></script>
+    <script src='/app/js/mongoDB.js'></script>
+    <script src='/app/js/query.js'></script>
+    <script src='/app/js/results.js'></script>
+    <script src='/app/js/record.js'></script>
+
+     <link rel="stylesheet" href="/static/stylesheets/uif.css" type="text/css"/>
+     <link rel="stylesheet" href="/static/stylesheets/search.css" type="text/css"/>
+     <link rel="stylesheet" href="/static/stylesheets/results.css" type="text/css"/>
+      <link rel="stylesheet" href="/static/stylesheets/record.css" type="text/css"/>
+    <title> Universal MongoDB Explorer </title>
+  </head>
+  <body>
+    <div ng-view></div>
+  </body>
+</html>

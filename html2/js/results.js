@@ -14,7 +14,16 @@ function ResultsController($scope, $location, mongoDB) {
     }
     
     $scope.nextPage = function() {
-        mongoDB.nextPage()
+        //Get the current page
+        //Add some to it
+        //Call results with that
+        var searchParams = {};
+        searchParams["terms"] = JSON.stringify(mongoDB.queryTerms);
+        searchParams["search"] = mongoDB.queryID;
+        searchParams["recordno"] = mongoDB.currentRecordNo + mongoDB.pageSize
+        $location.search(searchParams)
+        mongoDB.getCurrentResultsPage()
+        $scope.apply()
     }
     
     $scope.previousPage = function() {

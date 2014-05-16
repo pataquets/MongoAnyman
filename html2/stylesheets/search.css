@@ -1,0 +1,97 @@
+
+#availableSearchContainer {
+    position: fixed;
+    width: 25%;
+    background: #EFE;
+    padding: 0px 0px 0px 0px;
+     border-radius: 5px;
+     border: 2px solid #DDD;
+}
+
+#searchFieldsContainer {
+    position: fixed;
+    background: #EFE;
+    border: none;
+   width: 60%;
+    left: 30%;
+     border-radius: 5px;
+    border: 2px solid #DDD;
+}
+
+ul 
+{
+    padding:0;
+   margin: 0;
+}
+#availableSearchesList ul {
+    text-align: left;
+    list-style: none;
+   padding:0;
+   margin: 0;
+}
+
+#availableSearchesList li {
+    display: block;
+    margin: 0;
+    padding: 0;
+    top-margin: 15px;
+}
+
+#availableSearchesList a {
+    display: block;
+    width: 80%;
+    margin: 10px;
+    color: #000;
+    text-decoration: none;
+    background-color:#DED;
+    border-radius: 5px;
+    padding: 12px 10px 12px 20px;
+
+  -moz-box-shadow: inset 0px 1px 0px 0px #ffffff;
+    -webkit-box-shadow: inset 0px 1px 0px 0px #ffffff;
+    box-shadow: inset 0px 1px 0px 0px #ffffff;
+ border: 1px solid #dcdcdc;
+}
+
+
+.searchForm {
+    background-color: #f3f3f3;
+    border: solid 1px #a1a1a1;
+    padding: 10px;
+    width: 300px;
+}
+
+.searchForm label,.searchForm input {
+    display: block;
+    width: 60%; float : left;
+margin: 8px;
+    float: left;
+    border-radius: 5px;
+    padding: 12px 10px 12px 20px;
+}
+
+.searchForm label {
+     text-align:right:
+    font-weight: bold;
+    vertical-align: top;
+    background-color:#DED;
+    padding: 2px 10px 2px 20px;
+    width: 120px;
+
+    text-align: right;
+    padding-right: 20px;
+    border-radius: 5px;
+    padding: 12px 10px 12px 20px;
+}
+
+br {
+    clear: left;
+}
+
+ul#availableSearchesList li a:hover,ul#availableSearchesList li#active a:hover
+    {
+    background-color:#CDC;
+}
+
+
+

@@ -24,7 +24,7 @@ def get_subrec( table, fromcol, fromval,subreccursor,fields):
         return colset
     
 database = "jmdb"
-toptable = "movies"
+toptable = "actors"
 
 connection = pymongo.MongoClient("localhost:27017")
 
@@ -32,38 +32,32 @@ db = MySQLdb.connect(db=database, host="localhost",
                      port=3306, user="root", passwd="",
                      cursorclass=MySQLdb.cursors.DictCursor)
 
-moviecursor = db.cursor()
-moviecursor.execute("set charset utf8") #MongoDB uses UTF-8 so lets get that back from MySQL
+actorcursor = db.cursor()
+actorcursor.execute("set charset utf8") #MongoDB uses UTF-8 so lets get that back from MySQL
 
 subreccursor = db.cursor()
 subreccursor.execute("set charset utf8") #MongoDB uses UTF-8 so lets get that back from MySQL
 
 
-moviecursor.execute("select * from  " + toptable)
+actorcursor.execute("select * from  " + toptable)
 
-connection.imdb.data.drop();
+
 
 #Get list of sub tables
 
-metacursor = db.cursor()
-metacursor.execute(" select table_name from information_schema.columns where TABLE_SCHEMA='JMDB' and column_name='movieid' and table_name NOT LIKE '%%2%%' and table_name not like 'movies'")
-tables = metacursor.fetchall()
+
 count =0;
 recs = []
-for row in moviecursor.fetchall():
-    movieid = row.pop("movieid");
-    row["_id"] = "m"+str(movieid);
-    row["type"] = "production";
-    for subtab in tables:
-        tname = subtab["table_name"]
-        sval = get_subrec(tname,"movieid",movieid,subreccursor,None)
-        if sval :
-            row[tname] = sval
+for row in actorcursor.fetchall():
+    actorid = row.pop("actorid");
+    row["_id"] = "a"+str(actorid);
+    row["aka"] = get_subrec("akanames","name",row["name"])
+    row["biography"] = get_subrec("biographies","bioid",actorid)
     #Add links
-    tname = "movies2actors left join actors using (actorid)"
-    links = get_subrec(tname,"movieid",movieid,subreccursor,'movies2actors.movieid,movies2actors.as_character,CONCAT("a",movies2actors.actorid) as actorno,actors.name')
+    tname = "movies2actors left join movies using (movieid)"
+    links = get_subrec(tname,"actorid",actorid,subreccursor,'movies2actors.actorid,movies2actors.as_character,CONCAT("m",movies2actors.movieid) as movieno,movies.title')
     if links :
-        row['actors'] = links
+        row['movies'] = links
             
     recs.append((row))
     

@@ -1,7 +1,7 @@
 
 function RecordController($scope, $location,mongoDB) {
     $scope.mongoDB = mongoDB;
-    $scope.callcount = 0;
+
     
     //If this is loaded first then reroute
     if(mongoDB.searchList.length == 0)
@@ -35,7 +35,7 @@ function RecordController($scope, $location,mongoDB) {
     $scope.followLink = function( key, value)
     {
         linkDetails = mongoDB.getLinkDetails(key);
-        console.log(linkDetails)
+        
         //Set the appropriate search in mongoDB
         mongoDB.setQueryIDByName(linkDetails['tosearch'])
         var from = linkDetails['from']
@@ -46,8 +46,7 @@ function RecordController($scope, $location,mongoDB) {
     }
     
     $scope.getType = function(data) {
-        $scope.callcount++;
-      
+       
         obtype = Object.prototype.toString.call(data);
         sobtype = obtype.substring(8);
         sobtype = obtype.substring(8).substring(0, sobtype.length - 1);
