@@ -10,9 +10,12 @@
 
 <div class="searchForm" id="searchFieldsContainer">
 
-            <span ng-repeat='field in mongoDB.searchList[mongoDB.queryID].args'>
-            <label>{{field}}:</label>
-            <input ng-model="terms[field]"><br>
+            <span ng-repeat='field in mongoDB.currentQueryArgs()'>
+            <label>{{field.name}}:</label>
+         
+             <input ng-if="field.type  == 'Str' || field.type  == undefined || field.type  == 'Int'" ng-model="terms[field.name]">
+             <select ng-if="field.type  == 'Choice'" ng-model="terms[field.name]" ng-options="o for o in mongoDB.getOptions(field.field)"></select> 
+             <br>
             </span>
 
 

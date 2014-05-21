@@ -32,19 +32,45 @@ def send_root():
 @route('/results')
 def run_query_send_results():
     params = request.query.decode()
-    start = params['start']
-    pagesize = params['page']
-    queryID = params['queryID']
-    terms = params['terms']
-    termdict = json.loads(terms)
-    summary = global_searches[queryID]['summary']
+    try:
+        start = params['start']
+        pagesize = params['page']
+        queryID = params['queryID']
+        terms = params['terms']
+        termdict = json.loads(terms)
+    except:
+        return {}
+    
+    #aggregations have no summary
+    try:
+        summary = global_searches[queryID]['summary']
+    except:
+        pass
+    
     mycollection = global_searches[queryID]['collection']
     mydb = global_searches[queryID]['database']
     mysearch = json.loads(global_searches[queryID]['query'])
     queryobject = build_query(mysearch,termdict)
     pprint(queryobject)
     mysummary = json.loads(summary)
-    rval = connection[mydb][mycollection].find(queryobject,mysummary).skip(int(start)).limit(int(pagesize))
+    
+    #Is it an aggregation?
+    aggregate = None
+    
+    try:
+        aggregate = global_searches[queryID]['aggregate']
+    except:
+            pass
+        
+    if aggregate:
+        queryobject.append({"$skip":int(start)});
+        queryobject.append({"$limit":int(pagesize)});         
+        rval = connection[mydb][mycollection].aggregate(queryobject,cursor={})
+        
+        print "Aggregate"
+    else:
+        rval = connection[mydb][mycollection].find(queryobject,mysummary).skip(int(start)).limit(int(pagesize))
+        
     return json.dumps(list(rval),cls=DateTimeEncoder)
 
 
@@ -75,14 +101,24 @@ def build_query(query,params):
         return rval
     elif isinstance(query,basestring):
                 if(query[:1] == '@'):
-                    try:
-                        rval = params[query[1:]]
-                    except:
-                        rval = ""
-                    return rval
+                    if(query[1:2] == '#'):
+                        print "Integer Placeholder - Filling"
+                        try:
+                            rval = int(params[query[2:]])
+                        except:
+                            rval = ""
+                        return rval
+                    else:
+                        try:
+                            rval = params[query[1:]]
+                        except:
+                            rval = ""
+                        return rval
                 else:
+                    pprint(query)
                     return query
     else:
+        pprint(query)
         return query
                     
 def parse_out_placeholders(d,obj):
@@ -95,7 +131,13 @@ def parse_out_placeholders(d,obj):
             parse_out_placeholders(d,value)
     elif isinstance(obj,basestring):
                 if(obj[:1] == '@'):
-                    d[obj[1:]] = True
+                    print "What is " + obj;
+                    if(obj[1:2] == '#'):
+                        d[obj[2:]] = "Int"
+                        print "Numeric PLaceholder"
+                    else:
+                        d[obj[1:]] = "Str"
+                        print "String Placeholder"
            
             
     
@@ -107,14 +149,28 @@ def get_searches():
     #Don't want to send the actual query details to the client - it's a secret
     rsearches = [];
     for search in searches:
-        
+        #TODO Refactor
         s = {}
         s['name'] = search['_id'];
         s['description'] = search['description'];
         s['visible'] = search['visible'];
+        try:
+            s['aggregate'] = search['aggregate']
+        except:
+            pass
+        try:
+            s['drilldown'] = search['drilldown']
+        except:
+            pass
+
         placeholders = {}
         parse_out_placeholders(placeholders,json.loads(search['query']))
-        s['args'] = list(placeholders.keys())
+        s['args']=[]
+        try:
+            s['args'] = search['formorder']
+        except:
+            for p in list(placeholders.keys()):
+                s['args'].append({'name':p,'type':placeholders[p]})
         #Links optional
         try:    
             s['links'] = search['links']
@@ -132,7 +188,17 @@ def safecast_integer(s):
         return int(s)
     except ValueError:
         return s
-    
+
+@route('/options')
+def get_options():
+    params = request.query.decode()
+    queryID = params['queryID']
+    fname = params['fieldname']
+    mycollection = global_searches[queryID]['collection']
+    database = global_searches[queryID]['database']
+    options = connection[database][mycollection].distinct(fname);
+    return { 'fieldname': fname, 'options': options}
+
 @route('/records')
 def get_record():
     params = request.query.decode()
@@ -141,7 +207,7 @@ def get_record():
     
     mycollection = global_searches[queryID]['collection']
     database = global_searches[queryID]['database']
-    print "Record _id = " + recordID + "in" + mycollection;
+    print "Record _id = " + recordID + " in " + mycollection;
     recordID = safecast_integer(recordID)
     
     movie = connection[database][mycollection].find_one({"_id": recordID});

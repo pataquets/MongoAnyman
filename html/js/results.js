@@ -8,9 +8,42 @@ function ResultsController($scope, $location, mongoDB) {
         $location.path('/view/query');
     }
     
+    //On a click work out what we need to do
     $scope.selectRecord = function(which) {
-        mongoDB.fetchRecord(which)
-        $location.path('/view/record')
+        if(mongoDB.searchList[mongoDB.queryID].aggregate)
+        {
+           
+            //Get the parameters we used to get here
+            var newterms = mongoDB.queryTerms
+            
+            //Add the id from 'which'
+            var id = mongoDB.resultSet[which]['_id'];
+            newterms['RecordID'] = id;
+            //call the drilldown search
+            var drilldown = mongoDB.searchList[mongoDB.queryID].drilldown
+          
+            mongoDB.setQueryIDByName(drilldown)
+            mongoDB.doNewSearch(newterms)
+            return;
+        }
+        if(mongoDB.fetchRecord(which))
+        {
+            $location.path('/view/record')
+        }
+    }
+    
+    $scope.aggDrilldown = function( which )
+    {
+        
+        linkDetails = mongoDB.getLinkDetails(key);
+        console.log(linkDetails)
+        //Set the appropriate search in mongoDB
+        mongoDB.setQueryIDByName(linkDetails['tosearch'])
+        var from = linkDetails['from']
+        var q = {}
+        q[from] = value;
+        mongoDB.doNewSearch(q)
+        $location.path('/view/results')
     }
     
     $scope.nextPage = function() {

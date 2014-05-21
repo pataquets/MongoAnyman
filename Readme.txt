@@ -45,6 +45,8 @@ db.searches.insert({
 	 visible: false
 })
 
+
+
  
  db.searches.insert({
  _id: 'ActorByID',
@@ -70,6 +72,43 @@ db.searches.insert({
   visible: true
  })
  
+
+ 
+ //@ placeholder
+ //@# Numeric
+  db.searches.save({
+ _id: 'MoviesAgg',
+ description: 'Top Actors by Production',
+ collection: 'data',
+ database: 'imdb',
+ aggregate: true,
+ summary: '{"name":1}',
+ drilldown: 'MoviesByActor',
+ formorder: [{name:'Genre',type:'Choice',field:'genres'},{name:'From',type:'Int'},{name:'To',type:'Int'}],
+ query: '[{ "$match" : {"genres":"@Genre","datefrom":{ "$gt": "@#From", "$lt": "@#To"} }},{ "$unwind" : "$actors"},{ "$group": {"_id":"$actors.name", "Movies":{ "$sum" : 1}}},{ "$sort": {"Movies":-1}}]',
+ visible: true
+ })
+ 
+ db.searches.save({
+ _id: 'MoviesByActor',
+ description: 'Movies by Actor,Genre,Year',
+ collection: 'data',
+ database: 'imdb',
+ summary: '{"title":1}',
+ query: '{"actors.name":"@RecordID","genres":"@Genre","datefrom":{ "$gt": "@#From", "$lt": "@#To"}}',
+ links: [ {from: "movieno", tosearch: "MovieByID"} ],
+ visible: false
+ })
+ 
+ 
+ 
+ 
+pick = { $match : {genres:"Western",datefrom:{ $gt: 1950, $lt: 1960} }}
+project = { $project: { "actors.name":1 }}
+unwindcast  = { $unwind : "$actors.name"}
+countroles = { $group: {_id:"$actors.name", rolecount:{ $sum : 1}}}
+sortcount = { $sort: {rolecount:1}}
+ 
 Backlog, in order
 ---------
 
@@ -92,6 +131,7 @@ Aggreagtion
 
 Linkchart
 Links on record/between records
+Label Link (Actor Details), (All Movies)
 
 [Version 2 Demo]
 

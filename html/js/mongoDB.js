@@ -15,6 +15,7 @@ aMongoIntel.service('mongoDB', function($http, $timeout,$location, $rootScope) {
     this.resultStart = -1; // Info on what's cached
     this.searchList = [];
     this.queryID = 0;
+    this.cachedOptions = {}
     
     //Fetch our list of searches from the server
     $http.get('/searches').success(
@@ -37,7 +38,6 @@ aMongoIntel.service('mongoDB', function($http, $timeout,$location, $rootScope) {
         me.resultStart = -1; // Info on what's cached
         me.queryTerms = terms;
         // Also work out what we are meant to be doing
-        
     }
 
     // Return a view of the current page
@@ -141,17 +141,28 @@ aMongoIntel.service('mongoDB', function($http, $timeout,$location, $rootScope) {
     this.fetchRecord = function(recno) {
         
         me.currentRecordNo = recno
+       
         var id = me.resultSet[recno]['_id'];
-        //TODO add exception handler here
+        if(!id) {
+            console.log("No ID")
+            return false
+        }
+        
+        //When I click on something from an aggregation
+        //It may be a totally different query I want to do
+        //I may not want a single record
+        //It's more like following a link
+        
+        var drillDown = me.searchList[me.queryID].name;
         
         $http({url : '/records',
             method: "GET",
-            params: { queryID: me.searchList[me.queryID].name , recordID:id }                
+            params: { queryID: drillDown , recordID:id }                
         }).success(function(data) {
             angular.copy(data, me.currentRecordJSON)
-
-            me.lastUpdate = [ 2 ]; // Angular update hack
+            me.lastUpdate = [ 2 ]; // Angular force update hack
         })
+        return true;
     }
     
     this.getLinkDetails = function(fieldname)
@@ -166,6 +177,18 @@ aMongoIntel.service('mongoDB', function($http, $timeout,$location, $rootScope) {
        return null
     }
     
+    this.currentQueryArgs = function()
+    {
+        if(me.searchList[me.queryID] && me.searchList[me.queryID].visible == true)
+        {
+            if(me.searchList[me.queryID].formorder)
+            {
+                return me.searchList[me.queryID].formorder
+            }
+            return me.searchList[me.queryID].args //Random
+        }
+        return {}
+    }
     this.setQueryIDByName = function(name)
     {
         for (var i = 0; i < me.searchList.length; i++) { 
@@ -179,6 +202,27 @@ aMongoIntel.service('mongoDB', function($http, $timeout,$location, $rootScope) {
             }
         }
         console.log("Link to non existent")
+    }
+    
+    this.getOptions = function(fname)
+    {
+        if (me.cachedOptions[me.queryID + "-" + fname])
+        {
+            return me.cachedOptions[me.queryID + "-" + fname].options
+        }
+        
+        var params = { 'fieldname':fname, queryID: me.searchList[me.queryID].name  }   
+        
+        console.log(params)
+        
+        $http({url : '/options',
+            method: "GET",
+            params: params              
+        }).success(function(data) {
+            console.log(data)
+            angular.copy(data, me.cachedOptions[me.queryID + "-" + data.fieldname])
+        })
+        me.cachedOptions[me.queryID + "-" + fname] = {}
     }
     
 })

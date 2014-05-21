@@ -64,10 +64,21 @@ ul
 .searchForm label,.searchForm input {
     display: block;
     width: 60%; float : left;
-margin: 8px;
+    margin: 8px;
     float: left;
     border-radius: 5px;
     padding: 12px 10px 12px 20px;
+}
+
+ select
+{
+    border:0;
+    width: 66%; float : left;
+    margin: 8px;
+    float: left;
+    border-radius: 5px;
+    padding: 12px 10px 12px 20px;
+    font-size: 24px;
 }
 
 .searchForm label {
