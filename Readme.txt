@@ -1,3 +1,9 @@
+This is a tool which will allow you to offer acess to Data held in MongoDB throughout an organisation.
+It allows you to set queries users can run, set up aggregations they can run, allow them to view data and to browse links between data.
+
+I'm using the IMDB data set to develop it - any questions ask me, dont expect it just to work for you yet.
+
+
 Backlog, in order
 ---------
 
