@@ -1,3 +1,33 @@
+Backlog, in order
+---------
+
+*NB - this has been hacked, grown and evolved - a top down rewrite with Tests would be nice *
+*I'm still trying to get my head round Angular*
+*
+Change to use Get Params not Page state!
+
+Create a demo
+[Version 1 DEMO]
+
+
+Linkchart
+Multiple Links / Link Labeling
+Label Link (Actor Details), (All Movies)
+
+[Version 2 Demo]
+
+Maps and Geo
+
+[Version 3 demo]
+Auditing
+Login 
+User management
+Query Security
+Redaction
+Print templates
+Admin roles
+Query term highlighting??
+
 Getting Started
 ----------------
 
@@ -14,6 +44,12 @@ A search is defined as a mongoDB document in demos.searches
   collection:
   database: 
   summary: JSON PROJECTION
+  aggregate: [True / False] - is this an aggregation pipeline or a query
+  links: [ Array of objects { from: FIELDNAME, tosearch: "Name of search" ]
+  visible: [True/False] - is it on the list
+  drilldown: Agg only - Name of Search to run on click - existing paramsas passed + RecordID (which is _id)
+  formorder: Array of objects desribing search form in order (optional)
+  objects are {name: THe Label and placeholder, type 'Choice | Str | Int', field : (used with Choice to specify field for dropdown contents)
 }
   JSON QUERY is a String containing the JSON, not a JSON Object for a search, you can use placeholders as @Fieldname in the query
   which will be shown as the fields to search. All strings must be quoted.
@@ -29,7 +65,7 @@ db.searches.insert({
  collection: 'data',
  database: 'imdb',
  summary: '{"title":1}',
- query: '{ "$text": { "$search": "@Query" },"_id":{"$regex":"^m"}}',
+ query: '{ "$text": { "$search": "@Query" },"rectype":"prod"}',
  links: [ {from: "actorno", tosearch: "ActorByID"} ],
  visible: true
  })
@@ -67,7 +103,7 @@ db.searches.insert({
  collection: 'data',
  database: 'imdb',
  summary: '{"name":1}',
- query: '{ "$text": { "$search": "@Query" },"_id":{"$regex":"^a"}}',
+ query: '{ "$text": { "$search": "@Query" },"rectype":"pers"}',
  links: [ {from: "movieno", tosearch: "MovieByID"} ],
   visible: true
  })
@@ -109,43 +145,7 @@ unwindcast  = { $unwind : "$actors.name"}
 countroles = { $group: {_id:"$actors.name", rolecount:{ $sum : 1}}}
 sortcount = { $sort: {rolecount:1}}
  
-Backlog, in order
----------
 
-Search template[Done]
-*Bug - empty template fields [FIXED]
-regex support[DONE]
-next/previous greying on record[Done]
-
-
-Stylesheet [Done]
-
-Change to be RESTful - remove server state!
-
-Create a demo
-[Version 1 DEMO]
-
-Aggreagtion 
-
-[Version 1.5 demo]
-
-Linkchart
-Links on record/between records
-Label Link (Actor Details), (All Movies)
-
-[Version 2 Demo]
-
-Maps and Geo
-
-[Version 3 demo]
-Auditing
-Login 
-User management
-Query Security
-Redaction
-Print templates
-Admin roles
-Query term highlighting??
 
 
 Old notes
