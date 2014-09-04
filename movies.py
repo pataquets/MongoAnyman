@@ -30,12 +30,19 @@ connection = pymongo.MongoClient("localhost:27017")
 
 db = MySQLdb.connect(db=database, host="localhost",
                      port=3306, user="root", passwd="",
-                     cursorclass=MySQLdb.cursors.DictCursor)
+                     cursorclass=MySQLdb.cursors.SSDictCursor)
+db2 = MySQLdb.connect(db=database, host="localhost",
+                     port=3306, user="root", passwd="",
+                     cursorclass=MySQLdb.cursors.SSDictCursor)
+
+metacursor = db.cursor()
+metacursor.execute(" select table_name from information_schema.columns where TABLE_SCHEMA='JMDB' and column_name='movieid' and table_name NOT LIKE '%%2%%' and table_name not like 'movies'")
+tables = metacursor.fetchall()
 
 moviecursor = db.cursor()
 moviecursor.execute("set charset utf8") #MongoDB uses UTF-8 so lets get that back from MySQL
 
-subreccursor = db.cursor()
+subreccursor = db2.cursor()
 subreccursor.execute("set charset utf8") #MongoDB uses UTF-8 so lets get that back from MySQL
 
 
@@ -45,12 +52,10 @@ connection.imdb.data.drop();
 
 #Get list of sub tables
 
-metacursor = db.cursor()
-metacursor.execute(" select table_name from information_schema.columns where TABLE_SCHEMA='JMDB' and column_name='movieid' and table_name NOT LIKE '%%2%%' and table_name not like 'movies'")
-tables = metacursor.fetchall()
+
 count =0;
 recs = []
-for row in moviecursor.fetchall():
+for row in moviecursor:
     movieid = row.pop("movieid");
     row["_id"] = "m"+str(movieid);
     row["type"] = "production";

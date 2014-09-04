@@ -46,6 +46,11 @@ div.buttonBar {
     margin-bottom: 20px;
 }
 
+button:disabled {
+     color: #777777;
+     background-color: #EFE;
+}
+
 .controlButton {
     -moz-box-shadow: inset 0px 1px 0px 0px #ffffff;
     -webkit-box-shadow: inset 0px 1px 0px 0px #ffffff;
@@ -66,7 +71,7 @@ div.buttonBar {
     text-indent: 0;
     border: 1px solid #dcdcdc;
     display: inline-block;
-    color: #777777;
+    color: #000000;
     font-family: arial;
     font-size: 15px;
     font-weight: bold;

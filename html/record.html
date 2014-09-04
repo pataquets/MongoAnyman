@@ -1,8 +1,8 @@
 
 <div class="buttonBar">
-<button class="controlButton"  ng-disabled="mongoDB.currentRecordNo==0" ng-click="previousRecord()">Previous Record</button>
-<button  class="controlButton" ng-disabled="mongoDB.currentRecordNo+1==mongoDB.totalRecs"  ng-click="nextRecord()">Next Record</button>
-<button class="controlButton" ng-click="showResults()">Back to Results</button>
+<button class="controlButton"  ng-disabled="mongoDB.resultStart==-1 || mongoDB.currentRecordNo==0" ng-click="previousRecord()">Previous Record</button>
+<button  class="controlButton" ng-disabled="mongoDB.resultStart==-1 ||  mongoDB.currentRecordNo+1==mongoDB.totalRecs"  ng-click="nextRecord()">Next Record</button>
+<button class="controlButton" ng-disabled="mongoDB.resultStart==-1" ng-click="showResults()">Back to Results</button>
 <button class="controlButton"  ng-click="newSearch()">New Search</button>
 </div>
 
@@ -48,6 +48,6 @@
 
 <div class="recordTop">
 <!-- This little hack to force a reparse -->
-<ng-include  ng-repeat="v in mongoDB.lastUpdate" src="'subRecord.html'" onload="data = mongoDB.currentRecordJSON" ></ng-include>
+<ng-include  ng-repeat="v in mongoDB.getCurrentRecord()" src="'subRecord.html'" onload="data = mongoDB.currentRecordJSON" ></ng-include>
 </div>
 

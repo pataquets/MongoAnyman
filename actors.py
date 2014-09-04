@@ -8,8 +8,12 @@ def get_subrec( table, fromcol, fromval,subreccursor,fields):
         query = "select {0} from {1} where {2} = {3}".format(fields,table,fromcol,fromval);
         #print query;
     else:
+        if isinstance(fromval , basestring ):
+            fromval = fromval.replace("'","\\'")
+            fromval = "' "+fromval+" '"
+            
         query = "select * from " + table + " where " + fromcol + " = {0}".format(fromval);
-   
+#     print query
     subreccursor.execute(query)
     colset = subreccursor.fetchall();
     vallist = []
@@ -30,12 +34,17 @@ connection = pymongo.MongoClient("localhost:27017")
 
 db = MySQLdb.connect(db=database, host="localhost",
                      port=3306, user="root", passwd="",
-                     cursorclass=MySQLdb.cursors.DictCursor)
+                     cursorclass=MySQLdb.cursors.SSDictCursor)
+
+
+db2 = MySQLdb.connect(db=database, host="localhost",
+                     port=3306, user="root", passwd="",
+                     cursorclass=MySQLdb.cursors.SSDictCursor)
 
 actorcursor = db.cursor()
 actorcursor.execute("set charset utf8") #MongoDB uses UTF-8 so lets get that back from MySQL
 
-subreccursor = db.cursor()
+subreccursor = db2.cursor()
 subreccursor.execute("set charset utf8") #MongoDB uses UTF-8 so lets get that back from MySQL
 
 
@@ -48,11 +57,11 @@ actorcursor.execute("select * from  " + toptable)
 
 count =0;
 recs = []
-for row in actorcursor.fetchall():
+for row in actorcursor:
     actorid = row.pop("actorid");
     row["_id"] = "a"+str(actorid);
-    row["aka"] = get_subrec("akanames","name",row["name"])
-    row["biography"] = get_subrec("biographies","bioid",actorid)
+    row["aka"] = get_subrec("akanames","name",row["name"],subreccursor,None)
+    row["biography"] = get_subrec("biographies","bioid",actorid,subreccursor,None)
     #Add links
     tname = "movies2actors left join movies using (movieid)"
     links = get_subrec(tname,"actorid",actorid,subreccursor,'movies2actors.actorid,movies2actors.as_character,CONCAT("m",movies2actors.movieid) as movieno,movies.title')

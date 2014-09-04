@@ -6,7 +6,7 @@ function RecordController($scope, $location,mongoDB) {
     //If this is loaded first then reroute
     if(mongoDB.searchList.length == 0)
     {
-        $location.path('/view/query');
+        mongoDB.loadSearchList();
     }
     
     $scope.showResults = function()
@@ -16,15 +16,33 @@ function RecordController($scope, $location,mongoDB) {
     
     $scope.newSearch = function()
     {
+        
         $location.path('/view/query');
+        mongoDB.queryID=0;
+        $location.search({})
     }
     
-    $scope.nextRecord = function () {
-        mongoDB.nextRecord();
+    $scope.nextRecord = function () 
+    {
+        if(mongoDB.resultStart==-1 ) return; //No cached results page
+    
+        
+        var newRecNo = mongoDB.currentRecordNo + 1
+
+        if (newRecNo <= mongoDB.totalRecs) {
+            $location.search({cr:newRecNo,qi:mongoDB.queryID,sp:JSON.stringify(mongoDB.queryTerms)})
+        }
     }
     
     $scope.previousRecord = function () {
-        mongoDB.previousRecord();
+          if(mongoDB.resultStart==-1 ) return; //No cached results page
+    
+        
+        var newRecNo = mongoDB.currentRecordNo -1
+
+        if (newRecNo >=0) {
+            $location.search({cr:newRecNo,qi:mongoDB.queryID,sp:JSON.stringify(mongoDB.queryTerms)})
+        }
     }
     
     $scope.isLink = function(key)
@@ -36,13 +54,15 @@ function RecordController($scope, $location,mongoDB) {
     {
         linkDetails = mongoDB.getLinkDetails(key);
         console.log(linkDetails)
-        //Set the appropriate search in mongoDB
-        mongoDB.setQueryIDByName(linkDetails['tosearch'])
+       
         var from = linkDetails['from']
-        var q = {}
-        q[from] = value;
-        mongoDB.doNewSearch(q)
-        $location.path('/view/results')
+        var newterms = {}
+        newterms[from] = value;
+        
+        linksearch = mongoDB.getQueryIDFromName(linkDetails['tosearch'])
+
+        $location.search({cr:0,qi:linksearch,sp:JSON.stringify(newterms)}).path('/view/results');
+    
     }
     
     $scope.getType = function(data) {

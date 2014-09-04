@@ -44,6 +44,11 @@ for obj in connection.imdb.data.find({}):
     except KeyError:    
             #print "Bad date " + datefield
             pass
+    
+    if obj['_id'][:1] == 'm': 
+        obj['rectype'] = 'prod'
+    else:
+        obj['rectype'] = 'pers'
         
     batch.append(obj)
     count= count + 1
