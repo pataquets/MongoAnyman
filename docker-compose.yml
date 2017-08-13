@@ -1,0 +1,10 @@
+app:
+  image: pataquets/mongoanyman
+  net: container:mongo
+
+mongo:
+  image: mongo:3
+  command: mongod --smallfiles --nojournal --noprealloc
+  ports:
+    - "8080:8080"
+    - "27017:27017"
